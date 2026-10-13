@@ -1,0 +1,18 @@
+target/
+
+# Local database files
+data/
+*.db
+*.mv.db
+*.trace.db
+
+# Logs
+*.log
+
+# IDE metadata
+.idea/
+*.iml
+.vscode/
+
+# Operating system files
+.DS_Store

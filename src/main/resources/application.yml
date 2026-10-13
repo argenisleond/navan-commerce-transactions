@@ -1,0 +1,3 @@
+spring:
+  application:
+    name: navan-commerce-transactions
