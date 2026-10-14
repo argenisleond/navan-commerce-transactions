@@ -1,6 +1,8 @@
 spring:
   application:
     name: navan-commerce-transactions
+  jackson:
+    property-naming-strategy: SNAKE_CASE
   datasource:
     url: jdbc:h2:file:./data/navan-transactions
     username: sa

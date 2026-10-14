@@ -1,5 +1,6 @@
 package com.navan.commerce.transactions.transaction.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.navan.commerce.transactions.transaction.domain.NavanFeeKind;
 import com.navan.commerce.transactions.transaction.domain.TransactionType;
 
@@ -75,7 +76,7 @@ public record TransactionResponse(
             Instant departure,
             Instant arrival,
             String trainNumber,
-            String travelClass
+            @JsonProperty("class") String travelClass
     ) {
     }
 

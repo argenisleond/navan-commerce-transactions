@@ -1,7 +1,17 @@
 package com.navan.commerce.transactions.transaction.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.navan.commerce.transactions.transaction.domain.NavanFeeKind;
 import com.navan.commerce.transactions.transaction.domain.TransactionType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -10,13 +20,22 @@ import java.util.List;
 import java.util.Objects;
 
 public record CreateTransactionRequest(
-        TransactionType type,
-        String externalId,
-        String currency,
-        Instant occurredAt,
-        BigDecimal total,
-        List<TaxLine> taxLines,
-        List<FeeLine> feeLines,
+        @NotNull TransactionType type,
+        @NotBlank String externalId,
+        @NotBlank @Pattern(regexp = "[A-Z]{3}") String currency,
+        @NotNull Instant occurredAt,
+        @NotNull @DecimalMin("0.00") BigDecimal total,
+        @NotNull List<@Valid TaxLine> taxLines,
+        @NotNull List<@Valid FeeLine> feeLines,
+        @Valid @NotNull
+        @JsonTypeInfo(use = JsonTypeInfo.Id.NAME,
+                include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "type")
+        @JsonSubTypes({
+                @JsonSubTypes.Type(value = FlightMetadata.class, name = "flight"),
+                @JsonSubTypes.Type(value = HotelMetadata.class, name = "hotel"),
+                @JsonSubTypes.Type(value = RailMetadata.class, name = "rail"),
+                @JsonSubTypes.Type(value = NavanFeeMetadata.class, name = "navan_fee")
+        })
         Metadata metadata
 ) {
 
@@ -31,10 +50,14 @@ public record CreateTransactionRequest(
         Objects.requireNonNull(metadata);
     }
 
-    public record TaxLine(String name, BigDecimal rate, BigDecimal amount) {
+    public record TaxLine(
+            @NotBlank String name,
+            @DecimalMin("0.00") BigDecimal rate,
+            @NotNull BigDecimal amount
+    ) {
     }
 
-    public record FeeLine(String name, BigDecimal amount) {
+    public record FeeLine(@NotBlank String name, @NotNull BigDecimal amount) {
     }
 
     public sealed interface Metadata
@@ -42,10 +65,10 @@ public record CreateTransactionRequest(
     }
 
     public record FlightMetadata(
-            String origin,
-            String destination,
-            BigDecimal fare,
-            List<FlightCoupon> coupons
+            @NotBlank String origin,
+            @NotBlank String destination,
+            @NotNull BigDecimal fare,
+            @NotEmpty List<@Valid FlightCoupon> coupons
     ) implements Metadata {
         public FlightMetadata {
             coupons = List.copyOf(Objects.requireNonNull(coupons));
@@ -53,53 +76,57 @@ public record CreateTransactionRequest(
     }
 
     public record FlightCoupon(
-            String flightNumber,
+            @NotBlank String flightNumber,
             String carrier,
-            String from,
-            String to,
-            Instant departure,
-            Instant arrival
+            @NotBlank String from,
+            @NotBlank String to,
+            @NotNull Instant departure,
+            @NotNull Instant arrival
     ) {
     }
 
     public record HotelMetadata(
-            String name,
-            Address address,
-            LocalDate checkIn,
-            LocalDate checkOut,
-            int nights,
-            BigDecimal roomRatePerNight,
-            List<HotelExtra> extras
+            @NotBlank String name,
+            @Valid @NotNull Address address,
+            @NotNull LocalDate checkIn,
+            @NotNull LocalDate checkOut,
+            @Min(1) int nights,
+            @NotNull BigDecimal roomRatePerNight,
+            List<@Valid HotelExtra> extras
     ) implements Metadata {
         public HotelMetadata {
             extras = extras == null ? List.of() : List.copyOf(extras);
         }
     }
 
-    public record Address(String street, String city, String country) {
+    public record Address(
+            @NotBlank String street,
+            @NotBlank String city,
+            @NotBlank String country
+    ) {
     }
 
-    public record HotelExtra(String name, BigDecimal amount) {
+    public record HotelExtra(@NotBlank String name, @NotNull BigDecimal amount) {
     }
 
-    public record RailMetadata(List<RailLeg> legs) implements Metadata {
+    public record RailMetadata(@NotEmpty List<@Valid RailLeg> legs) implements Metadata {
         public RailMetadata {
             legs = List.copyOf(Objects.requireNonNull(legs));
         }
     }
 
     public record RailLeg(
-            String origin,
-            String destination,
-            Instant departure,
-            Instant arrival,
+            @NotBlank String origin,
+            @NotBlank String destination,
+            @NotNull Instant departure,
+            @NotNull Instant arrival,
             String trainNumber,
-            String travelClass
+            @JsonProperty("class") String travelClass
     ) {
     }
 
     public record NavanFeeMetadata(
-            NavanFeeKind feeKind,
+            @NotNull NavanFeeKind feeKind,
             String description,
             String relatedExternalId
     ) implements Metadata {
