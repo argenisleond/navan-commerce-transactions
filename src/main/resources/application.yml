@@ -1,3 +1,13 @@
 spring:
   application:
     name: navan-commerce-transactions
+  datasource:
+    url: jdbc:h2:file:./data/navan-transactions
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate.jdbc.time_zone: UTC
