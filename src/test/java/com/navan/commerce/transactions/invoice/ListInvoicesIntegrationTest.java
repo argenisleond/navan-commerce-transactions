@@ -1,5 +1,6 @@
 package com.navan.commerce.transactions.invoice;
 
+import com.navan.commerce.transactions.support.ApiIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
@@ -8,11 +9,11 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ListInvoicesIntegrationTest extends InvoiceIntegrationTestSupport {
+class ListInvoicesIntegrationTest extends ApiIntegrationTest {
 
     @Test
     void usesADefaultPageSizeOfFifty() throws Exception {
-        var flight = createTransaction("flight.json");
+        var flight = createStoredTransaction("flight.json");
         createInvoices(flight.id(), 51);
 
         var response = listInvoices(null, null, HttpStatus.OK);
@@ -25,7 +26,7 @@ class ListInvoicesIntegrationTest extends InvoiceIntegrationTestSupport {
 
     @Test
     void returnsConsecutiveDatabasePagesWithoutOverlap() throws Exception {
-        var flight = createTransaction("flight.json");
+        var flight = createStoredTransaction("flight.json");
         var createdIds = createInvoices(flight.id(), 11);
 
         assertPage(createdIds, 3, 0, true, 0, 3);

@@ -1,5 +1,6 @@
 package com.navan.commerce.transactions.invoice;
 
+import com.navan.commerce.transactions.support.ApiIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.springframework.http.HttpStatus;
@@ -11,7 +12,7 @@ import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class DeleteInvoiceIntegrationTest extends InvoiceIntegrationTestSupport {
+class DeleteInvoiceIntegrationTest extends ApiIntegrationTest {
 
     @Test
     void deletesTheInvoiceWithoutDeletingItsTransactions() throws Exception {

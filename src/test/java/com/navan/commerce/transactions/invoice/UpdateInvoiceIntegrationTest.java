@@ -1,6 +1,7 @@
 package com.navan.commerce.transactions.invoice;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.navan.commerce.transactions.support.ApiIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.springframework.http.HttpStatus;
@@ -13,7 +14,7 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class UpdateInvoiceIntegrationTest extends InvoiceIntegrationTestSupport {
+class UpdateInvoiceIntegrationTest extends ApiIntegrationTest {
 
     @Test
     void replacesTheTransactionSetAndRebuildsTheSnapshotAndRollups() throws Exception {
@@ -35,7 +36,7 @@ class UpdateInvoiceIntegrationTest extends InvoiceIntegrationTestSupport {
 
     @Test
     void returnsNotFoundForAnUnknownInvoice() throws Exception {
-        var flight = createTransaction("flight.json");
+        var flight = createStoredTransaction("flight.json");
         var invoiceId = UUID.randomUUID();
 
         var response = patchInvoice(invoiceId.toString(), List.of(flight.id()),
@@ -47,7 +48,7 @@ class UpdateInvoiceIntegrationTest extends InvoiceIntegrationTestSupport {
 
     @Test
     void missingReplacementTransactionLeavesTheInvoiceUnchanged() throws Exception {
-        var flight = createTransaction("flight.json");
+        var flight = createStoredTransaction("flight.json");
         var invoice = createSingleTransactionInvoice(flight.id());
         var missingId = UUID.randomUUID().toString();
 
@@ -58,12 +59,12 @@ class UpdateInvoiceIntegrationTest extends InvoiceIntegrationTestSupport {
 
     @Test
     void mixedCurrencyReplacementLeavesTheInvoiceUnchanged() throws Exception {
-        var flight = createTransaction("flight.json");
+        var flight = createStoredTransaction("flight.json");
         var invoice = createSingleTransactionInvoice(flight.id());
         var hotelBody = (ObjectNode) readFixture(TRANSACTION_FIXTURE_PATH + "hotel.json");
         hotelBody.put("currency", "USD");
         hotelBody.put("external_id", "hotel-usd");
-        var hotel = createTransaction(hotelBody);
+        var hotel = createStoredTransaction(hotelBody);
 
         patchInvoice(invoice.path("id").textValue(), List.of(flight.id(), hotel.id()),
                 HttpStatus.CONFLICT);
@@ -73,7 +74,7 @@ class UpdateInvoiceIntegrationTest extends InvoiceIntegrationTestSupport {
 
     @Test
     void repeatedReplacementIdLeavesTheInvoiceUnchanged() throws Exception {
-        var flight = createTransaction("flight.json");
+        var flight = createStoredTransaction("flight.json");
         var invoice = createSingleTransactionInvoice(flight.id());
 
         patchInvoice(invoice.path("id").textValue(), List.of(flight.id(), flight.id()),
@@ -84,8 +85,8 @@ class UpdateInvoiceIntegrationTest extends InvoiceIntegrationTestSupport {
 
     @Test
     void acceptsTheSingleTransactionRequestShape() throws Exception {
-        var flight = createTransaction("flight.json");
-        var hotel = createTransaction("hotel.json");
+        var flight = createStoredTransaction("flight.json");
+        var hotel = createStoredTransaction("hotel.json");
         var invoice = createSingleTransactionInvoice(flight.id());
         var requestBody = objectMapper.createObjectNode().put("transaction_id", hotel.id());
 

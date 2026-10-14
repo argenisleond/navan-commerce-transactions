@@ -1,5 +1,6 @@
 package com.navan.commerce.transactions.invoice;
 
+import com.navan.commerce.transactions.support.ApiIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,7 +10,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class GetInvoiceIntegrationTest extends InvoiceIntegrationTestSupport {
+class GetInvoiceIntegrationTest extends ApiIntegrationTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -26,7 +27,7 @@ class GetInvoiceIntegrationTest extends InvoiceIntegrationTestSupport {
 
     @Test
     void invoiceRemainsFrozenWhenTheStoredTransactionChanges() throws Exception {
-        var flight = createTransaction("flight.json");
+        var flight = createStoredTransaction("flight.json");
         var invoice = createSingleTransactionInvoice(flight.id());
 
         jdbcTemplate.update("UPDATE transactions SET total = ? WHERE id = ?",

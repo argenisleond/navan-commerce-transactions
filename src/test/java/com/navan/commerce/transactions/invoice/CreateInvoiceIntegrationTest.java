@@ -1,6 +1,7 @@
 package com.navan.commerce.transactions.invoice;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.navan.commerce.transactions.support.ApiIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
@@ -10,7 +11,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
-class CreateInvoiceIntegrationTest extends InvoiceIntegrationTestSupport {
+class CreateInvoiceIntegrationTest extends ApiIntegrationTest {
 
     @Test
     void createsATripInvoiceWithTransactionSnapshotsAndSeparateRollups() throws Exception {
@@ -51,7 +52,7 @@ class CreateInvoiceIntegrationTest extends InvoiceIntegrationTestSupport {
 
     @Test
     void acceptsTheSingleTransactionRequestShape() throws Exception {
-        var flight = createTransaction("flight.json");
+        var flight = createStoredTransaction("flight.json");
 
         var invoice = createSingleTransactionInvoice(flight.id());
 
@@ -62,7 +63,7 @@ class CreateInvoiceIntegrationTest extends InvoiceIntegrationTestSupport {
 
     @Test
     void returnsNotFoundWhenAnyTransactionDoesNotExist() throws Exception {
-        var flight = createTransaction("flight.json");
+        var flight = createStoredTransaction("flight.json");
         var missingId = UUID.randomUUID().toString();
 
         var response = postInvoice(
@@ -74,7 +75,7 @@ class CreateInvoiceIntegrationTest extends InvoiceIntegrationTestSupport {
 
     @Test
     void rejectsRepeatedTransactionIdsWithoutCreatingAnInvoice() throws Exception {
-        var flight = createTransaction("flight.json");
+        var flight = createStoredTransaction("flight.json");
 
         var response = postInvoice(
                 multipleTransactionBody(List.of(flight.id(), flight.id())), HttpStatus.CONFLICT);
@@ -86,11 +87,11 @@ class CreateInvoiceIntegrationTest extends InvoiceIntegrationTestSupport {
 
     @Test
     void rejectsMixedCurrenciesWithoutCreatingAnInvoice() throws Exception {
-        var flight = createTransaction("flight.json");
+        var flight = createStoredTransaction("flight.json");
         var hotelBody = (ObjectNode) readFixture(TRANSACTION_FIXTURE_PATH + "hotel.json");
         hotelBody.put("currency", "USD");
         hotelBody.put("external_id", "hotel-usd");
-        var hotel = createTransaction(hotelBody);
+        var hotel = createStoredTransaction(hotelBody);
 
         var response = postInvoice(
                 multipleTransactionBody(List.of(flight.id(), hotel.id())), HttpStatus.CONFLICT);
@@ -108,15 +109,15 @@ class CreateInvoiceIntegrationTest extends InvoiceIntegrationTestSupport {
 
     @Test
     void groupsTaxesByNameAndRateAndFeesByName() throws Exception {
-        var firstFlight = createTransaction("flight.json");
+        var firstFlight = createStoredTransaction("flight.json");
         var secondFlightBody = (ObjectNode) readFixture(TRANSACTION_FIXTURE_PATH + "flight.json");
         secondFlightBody.put("external_id", "second-flight");
-        var secondFlight = createTransaction(secondFlightBody);
-        var firstHotel = createTransaction("hotel.json");
+        var secondFlight = createStoredTransaction(secondFlightBody);
+        var firstHotel = createStoredTransaction("hotel.json");
         var secondHotelBody = (ObjectNode) readFixture(TRANSACTION_FIXTURE_PATH + "hotel.json");
         secondHotelBody.put("external_id", "second-hotel");
         ((ObjectNode) secondHotelBody.at("/tax_lines/0")).put("rate", 0.20);
-        var secondHotel = createTransaction(secondHotelBody);
+        var secondHotel = createStoredTransaction(secondHotelBody);
 
         var invoice = createInvoice(List.of(
                 firstFlight.id(), secondFlight.id(), firstHotel.id(), secondHotel.id()));

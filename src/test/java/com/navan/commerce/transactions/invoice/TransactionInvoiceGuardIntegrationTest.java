@@ -1,15 +1,16 @@
 package com.navan.commerce.transactions.invoice;
 
+import com.navan.commerce.transactions.support.ApiIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class TransactionInvoiceGuardIntegrationTest extends InvoiceIntegrationTestSupport {
+class TransactionInvoiceGuardIntegrationTest extends ApiIntegrationTest {
 
     @Test
     void rejectsUpdatingAnInvoicedTransactionAndPreservesBothRecords() throws Exception {
-        var flight = createTransaction("flight.json");
+        var flight = createStoredTransaction("flight.json");
         var invoice = createSingleTransactionInvoice(flight.id());
         var patch = objectMapper.createObjectNode().put("total", 999.99);
 
@@ -30,7 +31,7 @@ class TransactionInvoiceGuardIntegrationTest extends InvoiceIntegrationTestSuppo
 
     @Test
     void rejectsDeletingAnInvoicedTransactionAndPreservesBothRecords() throws Exception {
-        var flight = createTransaction("flight.json");
+        var flight = createStoredTransaction("flight.json");
         var invoice = createSingleTransactionInvoice(flight.id());
 
         var response = objectMapper.readTree(request()
@@ -48,8 +49,8 @@ class TransactionInvoiceGuardIntegrationTest extends InvoiceIntegrationTestSuppo
 
     @Test
     void removedTransactionCanBeUpdatedAfterInvoiceReplacement() throws Exception {
-        var flight = createTransaction("flight.json");
-        var hotel = createTransaction("hotel.json");
+        var flight = createStoredTransaction("flight.json");
+        var hotel = createStoredTransaction("hotel.json");
         var invoice = createSingleTransactionInvoice(flight.id());
         patchInvoice(invoice.path("id").textValue(), java.util.List.of(hotel.id()), HttpStatus.OK);
 
@@ -62,7 +63,7 @@ class TransactionInvoiceGuardIntegrationTest extends InvoiceIntegrationTestSuppo
 
     @Test
     void transactionsCanBeChangedAfterTheirOnlyInvoiceIsDeleted() throws Exception {
-        var flight = createTransaction("flight.json");
+        var flight = createStoredTransaction("flight.json");
         var invoice = createSingleTransactionInvoice(flight.id());
         request().delete("/invoices/{id}", invoice.path("id").textValue())
                 .then().statusCode(HttpStatus.NO_CONTENT.value());
