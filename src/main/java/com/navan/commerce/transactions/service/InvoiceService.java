@@ -2,9 +2,9 @@ package com.navan.commerce.transactions.service;
 
 import com.navan.commerce.transactions.domain.Invoice;
 import com.navan.commerce.transactions.domain.InvoiceRepository;
-import com.navan.commerce.transactions.dto.InvoicePageResponse;
 import com.navan.commerce.transactions.dto.InvoiceRequest;
 import com.navan.commerce.transactions.dto.InvoiceResponse;
+import com.navan.commerce.transactions.dto.PageResponse;
 import com.navan.commerce.transactions.exception.DuplicateInvoiceTransactionException;
 import com.navan.commerce.transactions.exception.InvalidInvoiceRequestException;
 import com.navan.commerce.transactions.exception.InvoiceNotFoundException;
@@ -48,7 +48,7 @@ public class InvoiceService {
     }
 
     @Transactional(readOnly = true)
-    public InvoicePageResponse list(int limit, long offset) {
+    public PageResponse<InvoiceResponse> list(int limit, long offset) {
         var sort = Sort.by(Sort.Order.asc("createdAt"), Sort.Order.asc("id"));
         var page = invoiceRepository.findAllBy(new OffsetPageRequest(offset, limit, sort));
         return responseMapper.toPage(page.getContent(), limit, offset, page.hasNext());

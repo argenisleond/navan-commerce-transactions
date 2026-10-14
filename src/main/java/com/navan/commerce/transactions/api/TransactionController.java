@@ -1,8 +1,8 @@
 package com.navan.commerce.transactions.api;
 
 import com.navan.commerce.transactions.dto.CreateTransactionRequest;
+import com.navan.commerce.transactions.dto.PageResponse;
 import com.navan.commerce.transactions.dto.PatchTransactionRequest;
-import com.navan.commerce.transactions.dto.TransactionPageResponse;
 import com.navan.commerce.transactions.dto.TransactionResponse;
 import com.navan.commerce.transactions.service.TransactionService;
 import jakarta.validation.Valid;
@@ -44,7 +44,7 @@ public class TransactionController {
     }
 
     @GetMapping
-    public TransactionPageResponse list(
+    public PageResponse<TransactionResponse> list(
             @RequestParam(defaultValue = "50") @Min(1) @Max(100) int limit,
             @RequestParam(defaultValue = "0") @Min(0) long offset) {
         return transactionService.list(limit, offset);

@@ -1,6 +1,5 @@
 package com.navan.commerce.transactions.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.navan.commerce.transactions.domain.NavanFeeKind;
 import com.navan.commerce.transactions.domain.TransactionType;
@@ -18,17 +17,10 @@ public record TransactionResponse(
         String currency,
         Instant occurredAt,
         BigDecimal total,
-        List<TaxLine> taxLines,
-        List<FeeLine> feeLines,
+        List<TaxLineResponse> taxLines,
+        List<FeeLineResponse> feeLines,
         Metadata metadata
 ){
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    public record TaxLine(String name, BigDecimal rate, BigDecimal amount) {
-    }
-
-    public record FeeLine(String name, BigDecimal amount) {
-    }
 
     public sealed interface Metadata
             permits FlightMetadata, HotelMetadata, RailMetadata, NavanFeeMetadata {

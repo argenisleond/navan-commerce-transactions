@@ -1,8 +1,8 @@
 package com.navan.commerce.transactions.api;
 
-import com.navan.commerce.transactions.dto.InvoicePageResponse;
 import com.navan.commerce.transactions.dto.InvoiceRequest;
 import com.navan.commerce.transactions.dto.InvoiceResponse;
+import com.navan.commerce.transactions.dto.PageResponse;
 import com.navan.commerce.transactions.service.InvoiceService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
@@ -43,7 +43,7 @@ public class InvoiceController {
     }
 
     @GetMapping
-    public InvoicePageResponse list(
+    public PageResponse<InvoiceResponse> list(
             @RequestParam(defaultValue = "50") @Min(1) @Max(100) int limit,
             @RequestParam(defaultValue = "0") @Min(0) long offset) {
         return invoiceService.list(limit, offset);

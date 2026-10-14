@@ -4,8 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.navan.commerce.transactions.domain.Invoice;
 import com.navan.commerce.transactions.domain.InvoiceLine;
-import com.navan.commerce.transactions.dto.InvoicePageResponse;
+import com.navan.commerce.transactions.dto.FeeLineResponse;
 import com.navan.commerce.transactions.dto.InvoiceResponse;
+import com.navan.commerce.transactions.dto.PageResponse;
+import com.navan.commerce.transactions.dto.TaxLineResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -17,20 +19,20 @@ public class InvoiceResponseMapper {
 
     private final ObjectMapper objectMapper;
 
-    public InvoicePageResponse toPage(List<Invoice> invoices, int limit,
-                                      long offset, boolean hasMore) {
-        return new InvoicePageResponse(
+    public PageResponse<InvoiceResponse> toPage(List<Invoice> invoices, int limit,
+                                                long offset, boolean hasMore) {
+        return new PageResponse<>(
                 invoices.stream().map(this::toResponse).toList(), limit, offset, hasMore);
     }
 
     public InvoiceResponse toResponse(Invoice invoice) {
         var lines = invoice.getLines().stream().map(this::toLine).toList();
         var taxRollups = invoice.getTaxRollups().stream()
-                .map(rollup -> new InvoiceResponse.TaxLine(
+                .map(rollup -> new TaxLineResponse(
                         rollup.getName(), rollup.getRate(), rollup.getAmount()))
                 .toList();
         var feeRollups = invoice.getFeeRollups().stream()
-                .map(rollup -> new InvoiceResponse.FeeLine(
+                .map(rollup -> new FeeLineResponse(
                         rollup.getName(), rollup.getAmount()))
                 .toList();
         return new InvoiceResponse(
@@ -40,11 +42,11 @@ public class InvoiceResponseMapper {
 
     private InvoiceResponse.Line toLine(InvoiceLine line) {
         var taxLines = line.getTaxLines().stream()
-                .map(tax -> new InvoiceResponse.TaxLine(
+                .map(tax -> new TaxLineResponse(
                         tax.getName(), tax.getRate(), tax.getAmount()))
                 .toList();
         var feeLines = line.getFeeLines().stream()
-                .map(fee -> new InvoiceResponse.FeeLine(fee.getName(), fee.getAmount()))
+                .map(fee -> new FeeLineResponse(fee.getName(), fee.getAmount()))
                 .toList();
         try {
             return new InvoiceResponse.Line(

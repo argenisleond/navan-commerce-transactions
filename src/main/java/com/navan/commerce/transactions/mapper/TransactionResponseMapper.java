@@ -1,7 +1,9 @@
 package com.navan.commerce.transactions.mapper;
 
 import com.navan.commerce.transactions.domain.Transaction;
-import com.navan.commerce.transactions.dto.TransactionPageResponse;
+import com.navan.commerce.transactions.dto.FeeLineResponse;
+import com.navan.commerce.transactions.dto.PageResponse;
+import com.navan.commerce.transactions.dto.TaxLineResponse;
 import com.navan.commerce.transactions.dto.TransactionResponse;
 import org.springframework.stereotype.Component;
 
@@ -10,19 +12,19 @@ import java.util.List;
 @Component
 public class TransactionResponseMapper {
 
-    public TransactionPageResponse toPage(List<Transaction> transactions, int limit,
-                                          long offset, boolean hasMore) {
+    public PageResponse<TransactionResponse> toPage(List<Transaction> transactions, int limit,
+                                                    long offset, boolean hasMore) {
         var items = transactions.stream().map(this::toResponse).toList();
-        return new TransactionPageResponse(items, limit, offset, hasMore);
+        return new PageResponse<>(items, limit, offset, hasMore);
     }
 
     public TransactionResponse toResponse(Transaction transaction) {
         var taxLines = transaction.getTaxLines().stream()
-                .map(line -> new TransactionResponse.TaxLine(
+                .map(line -> new TaxLineResponse(
                         line.getName(), line.getRate(), line.getAmount()))
                 .toList();
         var feeLines = transaction.getFeeLines().stream()
-                .map(line -> new TransactionResponse.FeeLine(line.getName(), line.getAmount()))
+                .map(line -> new FeeLineResponse(line.getName(), line.getAmount()))
                 .toList();
 
         return new TransactionResponse(

@@ -2,8 +2,12 @@ package com.navan.commerce.transactions.api;
 
 import com.navan.commerce.transactions.dto.DuplicateTransactionResponse;
 import com.navan.commerce.transactions.dto.ErrorResponse;
+import com.navan.commerce.transactions.exception.DuplicateInvoiceTransactionException;
 import com.navan.commerce.transactions.exception.DuplicateTransactionException;
+import com.navan.commerce.transactions.exception.InvalidInvoiceRequestException;
 import com.navan.commerce.transactions.exception.InvalidTransactionMetadataException;
+import com.navan.commerce.transactions.exception.InvoiceNotFoundException;
+import com.navan.commerce.transactions.exception.MixedInvoiceCurrencyException;
 import com.navan.commerce.transactions.exception.TransactionAlreadyInvoicedException;
 import com.navan.commerce.transactions.exception.TransactionNotFoundException;
 import com.navan.commerce.transactions.service.TransactionService;
@@ -16,42 +20,37 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.UUID;
 
-@RestControllerAdvice(assignableTypes = TransactionController.class)
+@RestControllerAdvice
 @RequiredArgsConstructor
-public class TransactionExceptionHandler {
+public class ApiExceptionHandler {
 
     private final TransactionService transactionService;
 
     @ExceptionHandler(DuplicateTransactionException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public DuplicateTransactionResponse handleDuplicate(DuplicateTransactionException exception) {
+    public DuplicateTransactionResponse handleDuplicateTransaction(
+            DuplicateTransactionException exception) {
         var existingId = findExistingId(exception.getExternalId());
         return new DuplicateTransactionResponse(existingId, exception.getMessage());
     }
 
-    @ExceptionHandler(TransactionNotFoundException.class)
+    @ExceptionHandler({InvoiceNotFoundException.class, TransactionNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleNotFound(TransactionNotFoundException exception) {
+    public ErrorResponse handleNotFound(RuntimeException exception) {
         return new ErrorResponse(exception.getMessage());
     }
 
-    @ExceptionHandler(InvalidTransactionMetadataException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleInvalidMetadata(
-            InvalidTransactionMetadataException exception) {
-        return new ErrorResponse(exception.getMessage());
-    }
-
-    @ExceptionHandler(TransactionAlreadyInvoicedException.class)
+    @ExceptionHandler({DuplicateInvoiceTransactionException.class,
+            MixedInvoiceCurrencyException.class, TransactionAlreadyInvoicedException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleAlreadyInvoiced(
-            TransactionAlreadyInvoicedException exception) {
+    public ErrorResponse handleConflict(RuntimeException exception) {
         return new ErrorResponse(exception.getMessage());
     }
 
-    @ExceptionHandler(ConstraintViolationException.class)
+    @ExceptionHandler({InvalidInvoiceRequestException.class,
+            InvalidTransactionMetadataException.class, ConstraintViolationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleValidation(ConstraintViolationException exception) {
+    public ErrorResponse handleInvalidRequest(RuntimeException exception) {
         return new ErrorResponse(exception.getMessage());
     }
 

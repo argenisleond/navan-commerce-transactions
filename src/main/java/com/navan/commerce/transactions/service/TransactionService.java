@@ -4,8 +4,8 @@ import com.navan.commerce.transactions.domain.InvoiceLineRepository;
 import com.navan.commerce.transactions.domain.Transaction;
 import com.navan.commerce.transactions.domain.TransactionRepository;
 import com.navan.commerce.transactions.dto.CreateTransactionRequest;
+import com.navan.commerce.transactions.dto.PageResponse;
 import com.navan.commerce.transactions.dto.PatchTransactionRequest;
-import com.navan.commerce.transactions.dto.TransactionPageResponse;
 import com.navan.commerce.transactions.dto.TransactionResponse;
 import com.navan.commerce.transactions.exception.DuplicateTransactionException;
 import com.navan.commerce.transactions.exception.TransactionNotFoundException;
@@ -58,7 +58,7 @@ public class TransactionService {
     }
 
     @Transactional(readOnly = true)
-    public TransactionPageResponse list(int limit, long offset) {
+    public PageResponse<TransactionResponse> list(int limit, long offset) {
         var sort = Sort.by(Sort.Order.asc("createdAt"), Sort.Order.asc("id"));
         var page = repository.findAllBy(new OffsetPageRequest(offset, limit, sort));
         return responseMapper.toPage(page.getContent(), limit, offset, page.hasNext());
