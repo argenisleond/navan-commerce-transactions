@@ -20,13 +20,20 @@ class UpdateInvoiceIntegrationTest extends ApiIntegrationTest {
     void replacesTheTransactionSetAndRebuildsTheSnapshotAndRollups() throws Exception {
         var trip = createTripTransactions();
         var invoice = createSingleTransactionInvoice(trip.flight().id());
+        request()
+                .body(objectMapper.createObjectNode().put("total", 350.00).toString())
+                .patch("/transactions/{id}", trip.hotel().id())
+                .then()
+                .statusCode(HttpStatus.OK.value());
 
         var updated = patchInvoice(invoice.path("id").textValue(),
                 List.of(trip.hotel().id(), trip.rail().id()), HttpStatus.OK);
 
-        assertThat(updated.path("total").decimalValue()).isEqualByComparingTo("425.70");
+        assertThat(updated.path("total").decimalValue()).isEqualByComparingTo("444.00");
         assertThat(lineTransactionIds(updated))
                 .containsExactly(trip.hotel().id(), trip.rail().id());
+        assertThat(findLine(updated, trip.hotel().id()).path("total").decimalValue())
+                .isEqualByComparingTo("350.00");
         assertThat(updated.path("tax_rollup").findValuesAsText("name"))
                 .containsExactly("VAT");
         assertThat(updated.path("fee_rollup").findValuesAsText("name"))
@@ -97,6 +104,16 @@ class UpdateInvoiceIntegrationTest extends ApiIntegrationTest {
 
         assertThat(lineTransactionIds(updated)).containsExactly(hotel.id());
         assertThat(updated.path("total").decimalValue()).isEqualByComparingTo("331.70");
+    }
+
+    @Test
+    void emptyReplacementLeavesTheInvoiceUnchanged() throws Exception {
+        var flight = createStoredTransaction("flight.json");
+        var invoice = createSingleTransactionInvoice(flight.id());
+
+        patchInvoice(invoice.path("id").textValue(), List.of(), HttpStatus.BAD_REQUEST);
+
+        assertThat(getInvoice(invoice.path("id").textValue(), HttpStatus.OK)).isEqualTo(invoice);
     }
 
     @Test

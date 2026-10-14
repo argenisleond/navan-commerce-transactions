@@ -71,6 +71,7 @@ class CreateInvoiceIntegrationTest extends ApiIntegrationTest {
 
         assertThat(response.path("message").textValue())
                 .isEqualTo("Transaction not found for id " + missingId);
+        assertInvoiceListIsEmpty();
     }
 
     @Test
