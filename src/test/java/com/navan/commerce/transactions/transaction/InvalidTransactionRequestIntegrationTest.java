@@ -1,7 +1,7 @@
 package com.navan.commerce.transactions.transaction;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.navan.commerce.transactions.transaction.domain.TransactionRepository;
+import com.navan.commerce.transactions.domain.TransactionRepository;
 import com.navan.commerce.transactions.support.ApiIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
