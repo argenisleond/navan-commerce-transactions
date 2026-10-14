@@ -2,18 +2,28 @@
 
 ## Overview
 
-This service is a feature-oriented modular monolith. Transaction and invoice
-features each own their controller, service, persistence model, and repository.
-Controllers map HTTP requests, services enforce business rules and transaction
-boundaries, and Flyway owns the database schema.
+This service is a small layered monolith. Packages group the shared API,
+services, DTOs, mappers, domain entities and repositories, exceptions, and
+pagination support. Controllers map HTTP requests, services enforce business
+rules and transaction boundaries, mappers keep persistence models out of the
+API, and Flyway owns the database schema.
 
 ```mermaid
 flowchart LR
-    Client --> TransactionController --> TransactionService --> H2[(File-backed H2)]
-    Client --> InvoiceController --> InvoiceService --> H2
-    InvoiceService -->|locks and snapshots| TransactionService
+    Client --> Controllers[Transaction and Invoice Controllers]
+    Controllers --> Services[Transaction and Invoice Services]
+    Services --> Mappers
+    Services --> Repositories[Spring Data Repositories]
+    InvoiceService -->|locks source rows| TransactionRepository
+    Repositories --> H2[(File-backed H2)]
+    ApiExceptionHandler -->|shared error responses| Client
     Flyway -->|schema and indexes| H2
 ```
+
+The `api` package contains both controllers and one shared exception handler.
+The `dto` package shares page, tax-line, fee-line, and error response types
+between transactions and invoices. `service` owns use cases, `mapper` owns API
+and snapshot conversion, and `domain` contains JPA entities and repositories.
 
 The application uses a file-backed H2 database at
 `jdbc:h2:file:./data/navan-transactions`. Hibernate validates the Flyway-managed
@@ -46,10 +56,10 @@ are UUIDs.
 
 ## Consistency and concurrency
 
-`external_id` has a database unique constraint. A preliminary lookup may make the
-normal duplicate path cheaper, but the constraint provides correctness when two
-POSTs race. The losing transaction rolls back, then returns `409 Conflict` with
-the winning transaction ID.
+`external_id` has a database unique constraint, which provides correctness when
+two POSTs race. Only that named constraint is interpreted as a duplicate. The
+losing transaction rolls back, and the shared exception handler resolves the
+winning row by `external_id` so the `409 Conflict` response includes its ID.
 
 Creating or updating a transaction writes its header, taxes, fees, and typed
 details atomically. Transaction PATCH and DELETE lock the row and check the
