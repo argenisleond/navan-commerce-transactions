@@ -19,10 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -95,10 +92,12 @@ public class InvoiceService {
         var transactionIds = hasSingleId
                 ? List.of(request.transactionId())
                 : request.transactionIds();
-        if (transactionIds.isEmpty() || transactionIds.stream().anyMatch(id -> id == null)) {
+
+        if (transactionIds.isEmpty()) {
             throw new InvalidInvoiceRequestException(
                     "At least one transaction id is required");
         }
+
         if (new LinkedHashSet<>(transactionIds).size() != transactionIds.size()) {
             throw new DuplicateInvoiceTransactionException();
         }
