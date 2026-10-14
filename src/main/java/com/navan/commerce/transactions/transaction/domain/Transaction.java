@@ -93,8 +93,38 @@ public class Transaction {
         taxLines.add(new TransactionTaxLine(this, taxLines.size(), name, rate, amount));
     }
 
+    public void replaceTaxLines(List<TaxLineValues> replacements) {
+        var retained = Math.min(taxLines.size(), replacements.size());
+        for (var index = 0; index < retained; index++) {
+            var line = replacements.get(index);
+            taxLines.get(index).update(line.name(), line.rate(), line.amount());
+        }
+        while (taxLines.size() > replacements.size()) {
+            taxLines.removeLast();
+        }
+        for (var index = retained; index < replacements.size(); index++) {
+            var line = replacements.get(index);
+            addTaxLine(line.name(), line.rate(), line.amount());
+        }
+    }
+
     public void addFeeLine(String name, BigDecimal amount) {
         feeLines.add(new TransactionFeeLine(this, feeLines.size(), name, amount));
+    }
+
+    public void replaceFeeLines(List<FeeLineValues> replacements) {
+        var retained = Math.min(feeLines.size(), replacements.size());
+        for (var index = 0; index < retained; index++) {
+            var line = replacements.get(index);
+            feeLines.get(index).update(line.name(), line.amount());
+        }
+        while (feeLines.size() > replacements.size()) {
+            feeLines.removeLast();
+        }
+        for (var index = retained; index < replacements.size(); index++) {
+            var line = replacements.get(index);
+            addFeeLine(line.name(), line.amount());
+        }
     }
 
     public void setFlightDetails(FlightDetails flightDetails) {
@@ -113,6 +143,32 @@ public class Transaction {
                 arrival, trainNumber, travelClass));
     }
 
+    public void replaceRailLegs(List<RailLegValues> replacements) {
+        var retained = Math.min(railLegs.size(), replacements.size());
+        for (var index = 0; index < retained; index++) {
+            var leg = replacements.get(index);
+            railLegs.get(index).update(
+                    leg.origin(), leg.destination(), leg.departure(), leg.arrival(),
+                    leg.trainNumber(), leg.travelClass());
+        }
+        while (railLegs.size() > replacements.size()) {
+            railLegs.removeLast();
+        }
+        for (var index = retained; index < replacements.size(); index++) {
+            var leg = replacements.get(index);
+            addRailLeg(leg.origin(), leg.destination(), leg.departure(), leg.arrival(),
+                    leg.trainNumber(), leg.travelClass());
+        }
+    }
+
+    public void updateOccurredAt(Instant occurredAt) {
+        this.occurredAt = occurredAt;
+    }
+
+    public void updateTotal(BigDecimal total) {
+        this.total = total;
+    }
+
     public void setNavanFeeDetails(NavanFeeDetails navanFeeDetails) {
         this.navanFeeDetails = navanFeeDetails;
         navanFeeDetails.attachTo(this);
@@ -128,5 +184,21 @@ public class Transaction {
 
     public List<RailLeg> getRailLegs() {
         return List.copyOf(railLegs);
+    }
+
+    public record TaxLineValues(String name, BigDecimal rate, BigDecimal amount) {
+    }
+
+    public record FeeLineValues(String name, BigDecimal amount) {
+    }
+
+    public record RailLegValues(
+            String origin,
+            String destination,
+            Instant departure,
+            Instant arrival,
+            String trainNumber,
+            String travelClass
+    ) {
     }
 }

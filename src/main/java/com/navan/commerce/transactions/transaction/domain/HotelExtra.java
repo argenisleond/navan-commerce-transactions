@@ -47,4 +47,9 @@ public class HotelExtra {
         this.amount = amount;
     }
 
+    void update(String name, BigDecimal amount) {
+        this.name = name;
+        this.amount = amount;
+    }
+
 }

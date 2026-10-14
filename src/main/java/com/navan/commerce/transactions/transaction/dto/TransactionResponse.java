@@ -1,5 +1,6 @@
 package com.navan.commerce.transactions.transaction.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.navan.commerce.transactions.transaction.domain.NavanFeeKind;
 import com.navan.commerce.transactions.transaction.domain.TransactionType;
@@ -22,6 +23,7 @@ public record TransactionResponse(
         Metadata metadata
 ) {
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public record TaxLine(String name, BigDecimal rate, BigDecimal amount) {
     }
 

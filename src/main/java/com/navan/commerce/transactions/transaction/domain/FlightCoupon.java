@@ -64,4 +64,14 @@ public class FlightCoupon {
         this.arrival = arrival;
     }
 
+    void update(String flightNumber, String carrier, String from, String to,
+                Instant departure, Instant arrival) {
+        this.flightNumber = flightNumber;
+        this.carrier = carrier;
+        this.from = from;
+        this.to = to;
+        this.departure = departure;
+        this.arrival = arrival;
+    }
+
 }

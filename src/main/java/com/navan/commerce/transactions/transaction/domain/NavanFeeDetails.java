@@ -54,4 +54,10 @@ public class NavanFeeDetails {
         this.transaction = transaction;
     }
 
+    public void update(NavanFeeKind feeKind, String description, String relatedExternalId) {
+        this.feeKind = feeKind;
+        this.description = description;
+        this.relatedExternalId = relatedExternalId;
+    }
+
 }

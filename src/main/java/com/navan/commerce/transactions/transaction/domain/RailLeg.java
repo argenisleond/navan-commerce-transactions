@@ -64,4 +64,14 @@ public class RailLeg {
         this.travelClass = travelClass;
     }
 
+    void update(String origin, String destination, Instant departure, Instant arrival,
+                String trainNumber, String travelClass) {
+        this.origin = origin;
+        this.destination = destination;
+        this.departure = departure;
+        this.arrival = arrival;
+        this.trainNumber = trainNumber;
+        this.travelClass = travelClass;
+    }
+
 }

@@ -67,7 +67,39 @@ public class FlightDetails {
                 from, to, departure, arrival));
     }
 
+    public void replace(String origin, String destination, BigDecimal fare,
+                        List<CouponValues> replacements) {
+        this.origin = origin;
+        this.destination = destination;
+        this.fare = fare;
+        var retained = Math.min(coupons.size(), replacements.size());
+        for (var index = 0; index < retained; index++) {
+            var coupon = replacements.get(index);
+            coupons.get(index).update(
+                    coupon.flightNumber(), coupon.carrier(), coupon.from(), coupon.to(),
+                    coupon.departure(), coupon.arrival());
+        }
+        while (coupons.size() > replacements.size()) {
+            coupons.removeLast();
+        }
+        for (var index = retained; index < replacements.size(); index++) {
+            var coupon = replacements.get(index);
+            addCoupon(coupon.flightNumber(), coupon.carrier(), coupon.from(), coupon.to(),
+                    coupon.departure(), coupon.arrival());
+        }
+    }
+
     public List<FlightCoupon> getCoupons() {
         return List.copyOf(coupons);
+    }
+
+    public record CouponValues(
+            String flightNumber,
+            String carrier,
+            String from,
+            String to,
+            Instant departure,
+            Instant arrival
+    ) {
     }
 }

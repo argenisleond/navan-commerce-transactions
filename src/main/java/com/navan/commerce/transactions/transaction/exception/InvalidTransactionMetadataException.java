@@ -1,4 +1,4 @@
-package com.navan.commerce.transactions.transaction.service;
+package com.navan.commerce.transactions.transaction.exception;
 
 public class InvalidTransactionMetadataException extends RuntimeException {
 

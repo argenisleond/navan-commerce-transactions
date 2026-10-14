@@ -87,7 +87,36 @@ public class HotelDetails {
         extras.add(new HotelExtra(this, extras.size(), name, amount));
     }
 
+    public void replace(String name, String addressStreet, String addressCity,
+                        String addressCountry, LocalDate checkIn, LocalDate checkOut,
+                        int nights, BigDecimal roomRatePerNight,
+                        List<ExtraValues> replacements) {
+        this.name = name;
+        this.addressStreet = addressStreet;
+        this.addressCity = addressCity;
+        this.addressCountry = addressCountry;
+        this.checkIn = checkIn;
+        this.checkOut = checkOut;
+        this.nights = nights;
+        this.roomRatePerNight = roomRatePerNight;
+        var retained = Math.min(extras.size(), replacements.size());
+        for (var index = 0; index < retained; index++) {
+            var extra = replacements.get(index);
+            extras.get(index).update(extra.name(), extra.amount());
+        }
+        while (extras.size() > replacements.size()) {
+            extras.removeLast();
+        }
+        for (var index = retained; index < replacements.size(); index++) {
+            var extra = replacements.get(index);
+            addExtra(extra.name(), extra.amount());
+        }
+    }
+
     public List<HotelExtra> getExtras() {
         return List.copyOf(extras);
+    }
+
+    public record ExtraValues(String name, BigDecimal amount) {
     }
 }

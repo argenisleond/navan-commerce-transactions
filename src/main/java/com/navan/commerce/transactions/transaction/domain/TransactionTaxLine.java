@@ -52,4 +52,10 @@ public class TransactionTaxLine {
         this.amount = amount;
     }
 
+    void update(String name, BigDecimal rate, BigDecimal amount) {
+        this.name = name;
+        this.rate = rate;
+        this.amount = amount;
+    }
+
 }

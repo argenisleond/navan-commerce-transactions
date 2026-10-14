@@ -1,11 +1,20 @@
 package com.navan.commerce.transactions.transaction.mapper;
 
 import com.navan.commerce.transactions.transaction.domain.Transaction;
+import com.navan.commerce.transactions.transaction.dto.TransactionPageResponse;
 import com.navan.commerce.transactions.transaction.dto.TransactionResponse;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class TransactionResponseMapper {
+
+    public TransactionPageResponse toPage(List<Transaction> transactions, int limit,
+                                          long offset, boolean hasMore) {
+        var items = transactions.stream().map(this::toResponse).toList();
+        return new TransactionPageResponse(items, limit, offset, hasMore);
+    }
 
     public TransactionResponse toResponse(Transaction transaction) {
         var taxLines = transaction.getTaxLines().stream()
