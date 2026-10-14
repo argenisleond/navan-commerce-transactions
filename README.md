@@ -48,6 +48,18 @@ transaction ID. Missing resources return `404`. Transactions referenced by an
 invoice cannot be patched or deleted and return `409`. Invoice requests with
 mixed currencies or repeated transaction IDs also return `409`.
 
+## Database and volume
+
+Flyway creates a unique index on `transactions.external_id`, primary-key indexes
+for transaction and invoice lookup, `(created_at, id)` indexes for ordered lists,
+and an index on `invoice_lines.source_transaction_id` for billed-transaction
+checks. Child foreign keys are also indexed where they are queried.
+
+List endpoints use database `LIMIT/OFFSET` through a Spring Data `Slice`, ordered
+by `(created_at, id)`. Each query reads at most the requested page plus one row to
+calculate `has_more`; it does not load the complete table or execute a count
+query. The default limit is 50 and the maximum is 100.
+
 ## Curl walkthrough
 
 The repository contains the five assignment payloads in `seed-payloads.json`.
