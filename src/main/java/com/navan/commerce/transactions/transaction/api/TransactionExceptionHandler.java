@@ -4,6 +4,7 @@ import com.navan.commerce.transactions.transaction.dto.DuplicateTransactionRespo
 import com.navan.commerce.transactions.transaction.dto.TransactionErrorResponse;
 import com.navan.commerce.transactions.transaction.exception.DuplicateTransactionException;
 import com.navan.commerce.transactions.transaction.exception.InvalidTransactionMetadataException;
+import com.navan.commerce.transactions.transaction.exception.TransactionAlreadyInvoicedException;
 import com.navan.commerce.transactions.transaction.exception.TransactionNotFoundException;
 import com.navan.commerce.transactions.transaction.service.TransactionService;
 import jakarta.validation.ConstraintViolationException;
@@ -38,6 +39,13 @@ public class TransactionExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public TransactionErrorResponse handleInvalidMetadata(
             InvalidTransactionMetadataException exception) {
+        return new TransactionErrorResponse(exception.getMessage());
+    }
+
+    @ExceptionHandler(TransactionAlreadyInvoicedException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public TransactionErrorResponse handleAlreadyInvoiced(
+            TransactionAlreadyInvoicedException exception) {
         return new TransactionErrorResponse(exception.getMessage());
     }
 

@@ -1,5 +1,6 @@
 package com.navan.commerce.transactions.transaction.service;
 
+import com.navan.commerce.transactions.invoice.domain.InvoiceLineRepository;
 import com.navan.commerce.transactions.transaction.domain.Transaction;
 import com.navan.commerce.transactions.transaction.domain.TransactionRepository;
 import com.navan.commerce.transactions.transaction.dto.CreateTransactionRequest;
@@ -8,9 +9,10 @@ import com.navan.commerce.transactions.transaction.dto.TransactionPageResponse;
 import com.navan.commerce.transactions.transaction.dto.TransactionResponse;
 import com.navan.commerce.transactions.transaction.exception.DuplicateTransactionException;
 import com.navan.commerce.transactions.transaction.exception.TransactionNotFoundException;
+import com.navan.commerce.transactions.transaction.exception.TransactionAlreadyInvoicedException;
 import com.navan.commerce.transactions.transaction.mapper.TransactionRequestMapper;
 import com.navan.commerce.transactions.transaction.mapper.TransactionResponseMapper;
-import com.navan.commerce.transactions.transaction.pagination.OffsetPageRequest;
+import com.navan.commerce.transactions.pagination.OffsetPageRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Sort;
@@ -25,6 +27,7 @@ import java.util.UUID;
 public class TransactionService {
 
     private final TransactionRepository repository;
+    private final InvoiceLineRepository invoiceLineRepository;
     private final TransactionRequestMapper requestMapper;
     private final TransactionResponseMapper responseMapper;
 
@@ -65,6 +68,7 @@ public class TransactionService {
     public TransactionResponse update(UUID id, PatchTransactionRequest request) {
         var transaction = repository.findLockedById(id)
                 .orElseThrow(() -> new TransactionNotFoundException(id));
+        ensureNotInvoiced(id);
 
         requestMapper.update(transaction, request);
 
@@ -76,8 +80,15 @@ public class TransactionService {
     public void delete(UUID id) {
         var transaction = repository.findLockedById(id)
                 .orElseThrow(() -> new TransactionNotFoundException(id));
+        ensureNotInvoiced(id);
         repository.delete(transaction);
         repository.flush();
+    }
+
+    private void ensureNotInvoiced(UUID id) {
+        if (invoiceLineRepository.existsBySourceTransactionId(id)) {
+            throw new TransactionAlreadyInvoicedException(id);
+        }
     }
 
 }

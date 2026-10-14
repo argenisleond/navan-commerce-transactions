@@ -148,8 +148,10 @@ class UpdateInvoiceIntegrationTest extends ApiIntegrationTest {
             var stored = getInvoice(invoice.path("id").textValue(), HttpStatus.OK);
             var storedIds = lineTransactionIds(stored);
             assertThat(storedIds.equals(firstIds) || storedIds.equals(secondIds)).isTrue();
-            assertThat(stored.path("total").decimalValue())
-                    .isIn(new java.math.BigDecimal("551.70"), new java.math.BigDecimal("134.00"));
+            var storedTotal = stored.path("total").decimalValue();
+            assertThat(storedTotal.compareTo(new java.math.BigDecimal("551.70")) == 0
+                    || storedTotal.compareTo(new java.math.BigDecimal("134.00")) == 0)
+                    .isTrue();
         } finally {
             executor.shutdownNow();
         }

@@ -1,4 +1,4 @@
-package com.navan.commerce.transactions.transaction.pagination;
+package com.navan.commerce.transactions.pagination;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
