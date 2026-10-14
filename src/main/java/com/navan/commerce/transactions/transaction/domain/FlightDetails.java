@@ -1,4 +1,4 @@
-package com.navan.commerce.transactions.transaction.persistence;
+package com.navan.commerce.transactions.transaction.domain;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -24,7 +24,7 @@ import java.util.UUID;
 @Table(name = "flight_details")
 @Getter
 @Setter(AccessLevel.PROTECTED)
-public class FlightDetailsEntity {
+public class FlightDetails {
 
     @Id
     @Column(name = "transaction_id")
@@ -33,7 +33,7 @@ public class FlightDetailsEntity {
     @MapsId
     @OneToOne(optional = false)
     @JoinColumn(name = "transaction_id")
-    private TransactionEntity transaction;
+    private Transaction transaction;
 
     @Column(nullable = false)
     private String origin;
@@ -46,28 +46,28 @@ public class FlightDetailsEntity {
 
     @OneToMany(mappedBy = "flightDetails", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("lineOrder ASC")
-    private List<FlightCouponEntity> coupons = new ArrayList<>();
+    private List<FlightCoupon> coupons = new ArrayList<>();
 
-    protected FlightDetailsEntity() {
+    protected FlightDetails() {
     }
 
-    public FlightDetailsEntity(String origin, String destination, BigDecimal fare) {
+    public FlightDetails(String origin, String destination, BigDecimal fare) {
         this.origin = origin;
         this.destination = destination;
         this.fare = fare;
     }
 
-    void attachTo(TransactionEntity transaction) {
+    void attachTo(Transaction transaction) {
         this.transaction = transaction;
     }
 
     public void addCoupon(String flightNumber, String carrier, String from, String to,
                           Instant departure, Instant arrival) {
-        coupons.add(new FlightCouponEntity(this, coupons.size(), flightNumber, carrier,
+        coupons.add(new FlightCoupon(this, coupons.size(), flightNumber, carrier,
                 from, to, departure, arrival));
     }
 
-    public List<FlightCouponEntity> getCoupons() {
+    public List<FlightCoupon> getCoupons() {
         return List.copyOf(coupons);
     }
 }

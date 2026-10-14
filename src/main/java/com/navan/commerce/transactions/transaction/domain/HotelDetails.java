@@ -1,4 +1,4 @@
-package com.navan.commerce.transactions.transaction.persistence;
+package com.navan.commerce.transactions.transaction.domain;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -24,7 +24,7 @@ import java.util.UUID;
 @Table(name = "hotel_details")
 @Getter
 @Setter(AccessLevel.PROTECTED)
-public class HotelDetailsEntity {
+public class HotelDetails {
 
     @Id
     @Column(name = "transaction_id")
@@ -33,7 +33,7 @@ public class HotelDetailsEntity {
     @MapsId
     @OneToOne(optional = false)
     @JoinColumn(name = "transaction_id")
-    private TransactionEntity transaction;
+    private Transaction transaction;
 
     @Column(nullable = false)
     private String name;
@@ -61,12 +61,12 @@ public class HotelDetailsEntity {
 
     @OneToMany(mappedBy = "hotelDetails", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("lineOrder ASC")
-    private List<HotelExtraEntity> extras = new ArrayList<>();
+    private List<HotelExtra> extras = new ArrayList<>();
 
-    protected HotelDetailsEntity() {
+    protected HotelDetails() {
     }
 
-    public HotelDetailsEntity(String name, String addressStreet, String addressCity,
+    public HotelDetails(String name, String addressStreet, String addressCity,
                               String addressCountry, LocalDate checkIn, LocalDate checkOut,
                               int nights, BigDecimal roomRatePerNight) {
         this.name = name;
@@ -79,15 +79,15 @@ public class HotelDetailsEntity {
         this.roomRatePerNight = roomRatePerNight;
     }
 
-    void attachTo(TransactionEntity transaction) {
+    void attachTo(Transaction transaction) {
         this.transaction = transaction;
     }
 
     public void addExtra(String name, BigDecimal amount) {
-        extras.add(new HotelExtraEntity(this, extras.size(), name, amount));
+        extras.add(new HotelExtra(this, extras.size(), name, amount));
     }
 
-    public List<HotelExtraEntity> getExtras() {
+    public List<HotelExtra> getExtras() {
         return List.copyOf(extras);
     }
 }

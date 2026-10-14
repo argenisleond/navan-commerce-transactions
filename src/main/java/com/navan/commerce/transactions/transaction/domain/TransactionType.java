@@ -1,4 +1,4 @@
-package com.navan.commerce.transactions.transaction.persistence;
+package com.navan.commerce.transactions.transaction.domain;
 
 public enum TransactionType {
     FLIGHT,

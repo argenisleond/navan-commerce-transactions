@@ -1,4 +1,4 @@
-package com.navan.commerce.transactions.transaction.persistence;
+package com.navan.commerce.transactions.transaction.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,7 +19,7 @@ import java.util.UUID;
 @Table(name = "navan_fee_details")
 @Getter
 @Setter(AccessLevel.PROTECTED)
-public class NavanFeeDetailsEntity {
+public class NavanFeeDetails {
 
     @Id
     @Column(name = "transaction_id")
@@ -28,7 +28,7 @@ public class NavanFeeDetailsEntity {
     @MapsId
     @OneToOne(optional = false)
     @JoinColumn(name = "transaction_id")
-    private TransactionEntity transaction;
+    private Transaction transaction;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "fee_kind", nullable = false, length = 32)
@@ -40,17 +40,17 @@ public class NavanFeeDetailsEntity {
     @Column(name = "related_external_id")
     private String relatedExternalId;
 
-    protected NavanFeeDetailsEntity() {
+    protected NavanFeeDetails() {
     }
 
-    public NavanFeeDetailsEntity(NavanFeeKind feeKind, String description,
+    public NavanFeeDetails(NavanFeeKind feeKind, String description,
                                  String relatedExternalId) {
         this.feeKind = feeKind;
         this.description = description;
         this.relatedExternalId = relatedExternalId;
     }
 
-    void attachTo(TransactionEntity transaction) {
+    void attachTo(Transaction transaction) {
         this.transaction = transaction;
     }
 

@@ -1,4 +1,4 @@
-package com.navan.commerce.transactions.transaction.persistence;
+package com.navan.commerce.transactions.transaction.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,14 +18,14 @@ import java.util.UUID;
 @Table(name = "transaction_fee_lines")
 @Getter
 @Setter(AccessLevel.PROTECTED)
-public class TransactionFeeLineEntity {
+public class TransactionFeeLine {
 
     @Id
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "transaction_id", nullable = false)
-    private TransactionEntity transaction;
+    private Transaction transaction;
 
     @Column(name = "line_order", nullable = false)
     private int lineOrder;
@@ -36,10 +36,10 @@ public class TransactionFeeLineEntity {
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal amount;
 
-    protected TransactionFeeLineEntity() {
+    protected TransactionFeeLine() {
     }
 
-    TransactionFeeLineEntity(TransactionEntity transaction, int lineOrder, String name,
+    TransactionFeeLine(Transaction transaction, int lineOrder, String name,
                              BigDecimal amount) {
         this.id = UUID.randomUUID();
         this.transaction = transaction;

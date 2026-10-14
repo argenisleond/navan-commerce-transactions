@@ -1,4 +1,4 @@
-package com.navan.commerce.transactions.transaction.persistence;
+package com.navan.commerce.transactions.transaction.domain;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -25,7 +25,7 @@ import java.util.UUID;
 @Table(name = "transactions")
 @Getter
 @Setter(AccessLevel.PROTECTED)
-public class TransactionEntity {
+public class Transaction {
 
     @Id
     private UUID id;
@@ -54,33 +54,33 @@ public class TransactionEntity {
 
     @OneToMany(mappedBy = "transaction", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("lineOrder ASC")
-    private List<TransactionTaxLineEntity> taxLines = new ArrayList<>();
+    private List<TransactionTaxLine> taxLines = new ArrayList<>();
 
     @OneToMany(mappedBy = "transaction", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("lineOrder ASC")
-    private List<TransactionFeeLineEntity> feeLines = new ArrayList<>();
+    private List<TransactionFeeLine> feeLines = new ArrayList<>();
 
     @OneToOne(mappedBy = "transaction", cascade = CascadeType.ALL,
             orphanRemoval = true, fetch = FetchType.LAZY)
-    private FlightDetailsEntity flightDetails;
+    private FlightDetails flightDetails;
 
     @OneToOne(mappedBy = "transaction", cascade = CascadeType.ALL,
             orphanRemoval = true, fetch = FetchType.LAZY)
-    private HotelDetailsEntity hotelDetails;
+    private HotelDetails hotelDetails;
 
     @OneToMany(mappedBy = "transaction", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("lineOrder ASC")
-    private List<RailLegEntity> railLegs = new ArrayList<>();
+    private List<RailLeg> railLegs = new ArrayList<>();
 
     @OneToOne(mappedBy = "transaction", cascade = CascadeType.ALL,
             orphanRemoval = true, fetch = FetchType.LAZY)
-    private NavanFeeDetailsEntity navanFeeDetails;
+    private NavanFeeDetails navanFeeDetails;
 
-    protected TransactionEntity() {
+    protected Transaction() {
     }
 
-    public TransactionEntity(String externalId, TransactionType type, String currency,
-                             Instant occurredAt, BigDecimal total) {
+    public Transaction(String externalId, TransactionType type, String currency,
+                       Instant occurredAt, BigDecimal total) {
         this.id = UUID.randomUUID();
         this.externalId = externalId;
         this.type = type;
@@ -90,43 +90,43 @@ public class TransactionEntity {
     }
 
     public void addTaxLine(String name, BigDecimal rate, BigDecimal amount) {
-        taxLines.add(new TransactionTaxLineEntity(this, taxLines.size(), name, rate, amount));
+        taxLines.add(new TransactionTaxLine(this, taxLines.size(), name, rate, amount));
     }
 
     public void addFeeLine(String name, BigDecimal amount) {
-        feeLines.add(new TransactionFeeLineEntity(this, feeLines.size(), name, amount));
+        feeLines.add(new TransactionFeeLine(this, feeLines.size(), name, amount));
     }
 
-    public void setFlightDetails(FlightDetailsEntity flightDetails) {
+    public void setFlightDetails(FlightDetails flightDetails) {
         this.flightDetails = flightDetails;
         flightDetails.attachTo(this);
     }
 
-    public void setHotelDetails(HotelDetailsEntity hotelDetails) {
+    public void setHotelDetails(HotelDetails hotelDetails) {
         this.hotelDetails = hotelDetails;
         hotelDetails.attachTo(this);
     }
 
     public void addRailLeg(String origin, String destination, Instant departure, Instant arrival,
                            String trainNumber, String travelClass) {
-        railLegs.add(new RailLegEntity(this, railLegs.size(), origin, destination, departure,
+        railLegs.add(new RailLeg(this, railLegs.size(), origin, destination, departure,
                 arrival, trainNumber, travelClass));
     }
 
-    public void setNavanFeeDetails(NavanFeeDetailsEntity navanFeeDetails) {
+    public void setNavanFeeDetails(NavanFeeDetails navanFeeDetails) {
         this.navanFeeDetails = navanFeeDetails;
         navanFeeDetails.attachTo(this);
     }
 
-    public List<TransactionTaxLineEntity> getTaxLines() {
+    public List<TransactionTaxLine> getTaxLines() {
         return List.copyOf(taxLines);
     }
 
-    public List<TransactionFeeLineEntity> getFeeLines() {
+    public List<TransactionFeeLine> getFeeLines() {
         return List.copyOf(feeLines);
     }
 
-    public List<RailLegEntity> getRailLegs() {
+    public List<RailLeg> getRailLegs() {
         return List.copyOf(railLegs);
     }
 }

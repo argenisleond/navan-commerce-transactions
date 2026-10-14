@@ -1,4 +1,4 @@
-package com.navan.commerce.transactions.transaction.persistence;
+package com.navan.commerce.transactions.transaction.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,17 +15,17 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
-@Table(name = "transaction_tax_lines")
+@Table(name = "hotel_extras")
 @Getter
 @Setter(AccessLevel.PROTECTED)
-public class TransactionTaxLineEntity {
+public class HotelExtra {
 
     @Id
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "transaction_id", nullable = false)
-    private TransactionEntity transaction;
+    private HotelDetails hotelDetails;
 
     @Column(name = "line_order", nullable = false)
     private int lineOrder;
@@ -33,22 +33,17 @@ public class TransactionTaxLineEntity {
     @Column(nullable = false)
     private String name;
 
-    @Column(precision = 9, scale = 6)
-    private BigDecimal rate;
-
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal amount;
 
-    protected TransactionTaxLineEntity() {
+    protected HotelExtra() {
     }
 
-    TransactionTaxLineEntity(TransactionEntity transaction, int lineOrder, String name,
-                             BigDecimal rate, BigDecimal amount) {
+    HotelExtra(HotelDetails hotelDetails, int lineOrder, String name, BigDecimal amount) {
         this.id = UUID.randomUUID();
-        this.transaction = transaction;
+        this.hotelDetails = hotelDetails;
         this.lineOrder = lineOrder;
         this.name = name;
-        this.rate = rate;
         this.amount = amount;
     }
 

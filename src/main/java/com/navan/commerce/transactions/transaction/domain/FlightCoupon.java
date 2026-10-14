@@ -1,4 +1,4 @@
-package com.navan.commerce.transactions.transaction.persistence;
+package com.navan.commerce.transactions.transaction.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,26 +15,32 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "rail_legs")
+@Table(name = "flight_coupons")
 @Getter
 @Setter(AccessLevel.PROTECTED)
-public class RailLegEntity {
+public class FlightCoupon {
 
     @Id
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "transaction_id", nullable = false)
-    private TransactionEntity transaction;
+    private FlightDetails flightDetails;
 
     @Column(name = "line_order", nullable = false)
     private int lineOrder;
 
-    @Column(nullable = false)
-    private String origin;
+    @Column(name = "flight_number", nullable = false, length = 64)
+    private String flightNumber;
 
-    @Column(nullable = false)
-    private String destination;
+    @Column(length = 64)
+    private String carrier;
+
+    @Column(name = "from_location", nullable = false)
+    private String from;
+
+    @Column(name = "to_location", nullable = false)
+    private String to;
 
     @Column(nullable = false)
     private Instant departure;
@@ -42,26 +48,20 @@ public class RailLegEntity {
     @Column(nullable = false)
     private Instant arrival;
 
-    @Column(name = "train_number", length = 64)
-    private String trainNumber;
-
-    @Column(name = "travel_class", length = 64)
-    private String travelClass;
-
-    protected RailLegEntity() {
+    protected FlightCoupon() {
     }
 
-    RailLegEntity(TransactionEntity transaction, int lineOrder, String origin, String destination,
-                  Instant departure, Instant arrival, String trainNumber, String travelClass) {
+    FlightCoupon(FlightDetails flightDetails, int lineOrder, String flightNumber,
+                       String carrier, String from, String to, Instant departure, Instant arrival) {
         this.id = UUID.randomUUID();
-        this.transaction = transaction;
+        this.flightDetails = flightDetails;
         this.lineOrder = lineOrder;
-        this.origin = origin;
-        this.destination = destination;
+        this.flightNumber = flightNumber;
+        this.carrier = carrier;
+        this.from = from;
+        this.to = to;
         this.departure = departure;
         this.arrival = arrival;
-        this.trainNumber = trainNumber;
-        this.travelClass = travelClass;
     }
 
 }
