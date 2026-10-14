@@ -1,0 +1,20 @@
+{
+  "occurred_at": "2026-03-14T10:00:00Z",
+  "total": 105.0,
+  "tax_lines": [],
+  "fee_lines": [
+    { "name": "Exchange fee", "amount": 5.0 }
+  ],
+  "metadata": {
+    "legs": [
+      {
+        "origin": "Paris Nord",
+        "destination": "Brussels Midi",
+        "departure": "2026-03-14T10:00:00Z",
+        "arrival": "2026-03-14T11:25:00Z",
+        "train_number": "THA9321",
+        "class": "comfort"
+      }
+    ]
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "occurred_at": "2026-03-12T15:00:00Z",
+  "total": 360.0,
+  "tax_lines": [
+    { "name": "VAT", "rate": 0.07, "amount": 23.0 }
+  ],
+  "fee_lines": [
+    { "name": "City fee", "amount": 7.0 }
+  ],
+  "metadata": {
+    "name": "Hotel Mitte London Updated",
+    "address": {
+      "street": "20 Kingsway",
+      "city": "London",
+      "country": "GB"
+    },
+    "check_in": "2026-03-12",
+    "check_out": "2026-03-15",
+    "nights": 3,
+    "room_rate_per_night": 110.0,
+    "extras": [
+      { "name": "Breakfast", "amount": 30.0 }
+    ]
+  }
+}

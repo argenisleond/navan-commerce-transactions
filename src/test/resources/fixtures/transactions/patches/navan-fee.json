@@ -1,0 +1,13 @@
+{
+  "occurred_at": "2026-03-12T18:00:00Z",
+  "total": 30.0,
+  "tax_lines": [
+    { "name": "VAT", "rate": 0.2, "amount": 5.0 }
+  ],
+  "fee_lines": [],
+  "metadata": {
+    "fee_kind": "agent_call_fee",
+    "description": "Agent fee for changed itinerary",
+    "related_external_id": "flight-TXL-LHR-2026-03-11"
+  }
+}
