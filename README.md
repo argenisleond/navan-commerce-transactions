@@ -32,6 +32,7 @@ temporary file-backed H2 database, and clean the database before every test.
 
 | Method | Path | Result |
 | --- | --- | --- |
+| `GET` | `/health` | Report application liveness. |
 | `POST` | `/transactions` | Create a flight, hotel, rail, or Navan fee transaction. |
 | `GET` | `/transactions/{id}` | Read one transaction. |
 | `GET` | `/transactions?limit=50&offset=0` | Read a bounded page; maximum limit is 100. |
