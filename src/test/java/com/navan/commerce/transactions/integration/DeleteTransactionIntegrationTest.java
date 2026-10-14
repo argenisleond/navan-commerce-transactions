@@ -1,6 +1,5 @@
-package com.navan.commerce.transactions.transaction;
+package com.navan.commerce.transactions.integration;
 
-import com.navan.commerce.transactions.support.ApiIntegrationTest;
 import com.navan.commerce.transactions.domain.TransactionRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;

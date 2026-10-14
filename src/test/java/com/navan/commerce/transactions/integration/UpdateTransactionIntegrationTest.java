@@ -1,8 +1,7 @@
-package com.navan.commerce.transactions.transaction;
+package com.navan.commerce.transactions.integration;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.navan.commerce.transactions.support.ApiIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.params.ParameterizedTest;

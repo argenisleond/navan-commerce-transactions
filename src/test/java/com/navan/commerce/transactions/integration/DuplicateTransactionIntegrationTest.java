@@ -1,8 +1,7 @@
-package com.navan.commerce.transactions.transaction;
+package com.navan.commerce.transactions.integration;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.navan.commerce.transactions.domain.TransactionRepository;
-import com.navan.commerce.transactions.support.ApiIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,5 @@
-package com.navan.commerce.transactions.invoice;
+package com.navan.commerce.transactions.integration;
 
-import com.navan.commerce.transactions.support.ApiIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.springframework.http.HttpStatus;

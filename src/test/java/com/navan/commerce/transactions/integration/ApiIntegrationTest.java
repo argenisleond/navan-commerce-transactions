@@ -1,4 +1,4 @@
-package com.navan.commerce.transactions.support;
+package com.navan.commerce.transactions.integration;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
