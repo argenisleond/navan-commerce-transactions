@@ -7,6 +7,7 @@ import com.navan.commerce.transactions.transaction.domain.Transaction;
 import com.navan.commerce.transactions.transaction.domain.TransactionRepository;
 import com.navan.commerce.transactions.transaction.dto.CreateTransactionRequest;
 import com.navan.commerce.transactions.transaction.dto.TransactionResponse;
+import com.navan.commerce.transactions.transaction.mapper.TransactionResponseMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class TransactionService {
 
     private final TransactionRepository repository;
+    private final TransactionResponseMapper responseMapper;
 
     @Transactional
     public TransactionResponse create(CreateTransactionRequest request) {
@@ -35,7 +37,7 @@ public class TransactionService {
         addMetadata(transaction, request);
         repository.saveAndFlush(transaction);
 
-        return toResponse(transaction);
+        return responseMapper.toResponse(transaction);
     }
 
     private void addMetadata(Transaction transaction, CreateTransactionRequest request) {
@@ -110,94 +112,4 @@ public class TransactionService {
         return expectedType.cast(request.metadata());
     }
 
-    private TransactionResponse toResponse(Transaction transaction) {
-        var taxLines = transaction.getTaxLines().stream()
-                .map(line -> new TransactionResponse.TaxLine(
-                        line.getName(), line.getRate(), line.getAmount()))
-                .toList();
-        var feeLines = transaction.getFeeLines().stream()
-                .map(line -> new TransactionResponse.FeeLine(line.getName(), line.getAmount()))
-                .toList();
-
-        return new TransactionResponse(
-                transaction.getId(),
-                transaction.getType(),
-                transaction.getExternalId(),
-                transaction.getCurrency(),
-                transaction.getOccurredAt(),
-                transaction.getTotal(),
-                taxLines,
-                feeLines,
-                metadataView(transaction)
-        );
-    }
-
-    private TransactionResponse.Metadata metadataView(Transaction transaction) {
-        return switch (transaction.getType()) {
-            case FLIGHT -> flightView(transaction);
-            case HOTEL -> hotelView(transaction);
-            case RAIL -> railView(transaction);
-            case NAVAN_FEE -> navanFeeView(transaction);
-        };
-    }
-
-    private TransactionResponse.FlightMetadata flightView(Transaction transaction) {
-        var details = transaction.getFlightDetails();
-        var coupons = details.getCoupons().stream()
-                .map(coupon -> new TransactionResponse.FlightCoupon(
-                        coupon.getFlightNumber(),
-                        coupon.getCarrier(),
-                        coupon.getFrom(),
-                        coupon.getTo(),
-                        coupon.getDeparture(),
-                        coupon.getArrival()
-                ))
-                .toList();
-        return new TransactionResponse.FlightMetadata(
-                details.getOrigin(), details.getDestination(), details.getFare(), coupons);
-    }
-
-    private TransactionResponse.HotelMetadata hotelView(Transaction transaction) {
-        var details = transaction.getHotelDetails();
-        var address = new TransactionResponse.Address(
-                details.getAddressStreet(),
-                details.getAddressCity(),
-                details.getAddressCountry()
-        );
-        var extras = details.getExtras().stream()
-                .map(extra -> new TransactionResponse.HotelExtra(extra.getName(), extra.getAmount()))
-                .toList();
-        return new TransactionResponse.HotelMetadata(
-                details.getName(),
-                address,
-                details.getCheckIn(),
-                details.getCheckOut(),
-                details.getNights(),
-                details.getRoomRatePerNight(),
-                extras
-        );
-    }
-
-    private TransactionResponse.RailMetadata railView(Transaction transaction) {
-        var legs = transaction.getRailLegs().stream()
-                .map(leg -> new TransactionResponse.RailLeg(
-                        leg.getOrigin(),
-                        leg.getDestination(),
-                        leg.getDeparture(),
-                        leg.getArrival(),
-                        leg.getTrainNumber(),
-                        leg.getTravelClass()
-                ))
-                .toList();
-        return new TransactionResponse.RailMetadata(legs);
-    }
-
-    private TransactionResponse.NavanFeeMetadata navanFeeView(Transaction transaction) {
-        var details = transaction.getNavanFeeDetails();
-        return new TransactionResponse.NavanFeeMetadata(
-                details.getFeeKind(),
-                details.getDescription(),
-                details.getRelatedExternalId()
-        );
-    }
 }
