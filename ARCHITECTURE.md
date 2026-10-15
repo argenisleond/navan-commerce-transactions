@@ -43,8 +43,10 @@ schema, and Open Session in View is disabled.
 | Invoice tax, fee, and rollup tables | Copied tax and fee lines plus separate persisted invoice-level summaries. |
 
 Live type-specific data is normalized because it is validated and may be queried.
-Snapshot metadata is JSON because it is immutable and returned as a whole. Taxes
-and fees remain relational so they can be rolled up independently.
+Snapshot metadata is JSON because it is immutable and returned as a whole. A
+dedicated persistence mapper defines its field names and value formats independently
+from API DTOs and global Jackson naming. Taxes and fees remain relational so they
+can be rolled up independently.
 
 At the API boundary, `tax_lines`, `fee_lines`, and typed `metadata` are required;
 tax and fee lists may be empty. Responses reconstruct the same metadata shape

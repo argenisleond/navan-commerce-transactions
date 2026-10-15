@@ -17,7 +17,7 @@ class InvoiceSnapshotMapperTest {
             .findAndRegisterModules()
             .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
     private final InvoiceSnapshotMapper mapper = new InvoiceSnapshotMapper(
-            objectMapper, new TransactionResponseMapper());
+            new InvoiceMetadataSnapshotMapper());
 
     @Test
     void snapshotsLinesAndBuildsIndependentTaxAndFeeRollups() throws Exception {
