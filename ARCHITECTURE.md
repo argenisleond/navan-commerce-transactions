@@ -12,10 +12,7 @@ API, and Flyway owns the database schema.
 flowchart LR
     Client --> Controller
     Controller --> Service
-    Service --> Mapper
-    Mapper --> Entity
     Service --> Repository
-    Repository --> Entity
     Repository --> Database[(Database)]
 ```
 
