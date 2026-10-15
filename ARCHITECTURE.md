@@ -10,14 +10,13 @@ API, and Flyway owns the database schema.
 
 ```mermaid
 flowchart LR
-    Client --> Controllers[Transaction and Invoice Controllers]
-    Controllers --> Services[Transaction and Invoice Services]
-    Services --> Mappers
-    Services --> Repositories[Spring Data Repositories]
-    InvoiceService -->|locks source rows| TransactionRepository
-    Repositories --> H2[(File-backed H2)]
-    ApiExceptionHandler -->|shared error responses| Client
-    Flyway -->|schema and indexes| H2
+    Client --> Controller
+    Controller --> Service
+    Service --> Mapper
+    Mapper --> Entity
+    Service --> Repository
+    Repository --> Entity
+    Repository --> Database[(Database)]
 ```
 
 The `api` package contains both controllers and one shared exception handler.
