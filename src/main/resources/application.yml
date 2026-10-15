@@ -13,3 +13,4 @@ spring:
     open-in-view: false
     properties:
       hibernate.jdbc.time_zone: UTC
+      hibernate.default_batch_fetch_size: 100

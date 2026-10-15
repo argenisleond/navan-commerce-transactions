@@ -81,7 +81,9 @@ to the gross total again. Mixed currencies return `409`.
 
 Lists use database `LIMIT`/`OFFSET`, ordered by `(created_at, id)`, with a default
 limit of 50 and maximum of 100. Fetching one extra row produces `has_more`
-without a full count or in-memory pagination.
+without a full count or in-memory pagination. To-one transaction details are
+loaded with the page, while collections are batch-fetched up to the maximum page
+size to avoid per-row queries.
 
 The schema includes:
 

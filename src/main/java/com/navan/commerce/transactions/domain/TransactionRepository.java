@@ -3,6 +3,7 @@ package com.navan.commerce.transactions.domain;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 
@@ -21,5 +22,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     List<Transaction> findAllByIdInOrderByIdAsc(Collection<UUID> ids);
 
+    @EntityGraph(attributePaths = {"flightDetails", "hotelDetails", "navanFeeDetails"})
     Slice<Transaction> findAllBy(Pageable pageable);
 }

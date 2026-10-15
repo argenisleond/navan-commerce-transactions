@@ -16,6 +16,7 @@ class ListTransactionsIntegrationTest extends ApiIntegrationTest {
     @Test
     void usesADefaultPageSizeOfFifty() throws Exception {
         createTransactions(51);
+        var statistics = resetDatabaseStatistics();
 
         var responseBody = objectMapper.readTree(request()
                 .get("/transactions")
@@ -28,6 +29,7 @@ class ListTransactionsIntegrationTest extends ApiIntegrationTest {
         assertThat(responseBody.path("limit").intValue()).isEqualTo(50);
         assertThat(responseBody.path("offset").intValue()).isZero();
         assertThat(responseBody.path("has_more").booleanValue()).isTrue();
+        assertThat(statistics.getPrepareStatementCount()).isLessThanOrEqualTo(10);
     }
 
     @Test

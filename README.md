@@ -59,7 +59,8 @@ checks. Child foreign keys are also indexed where they are queried.
 List endpoints use database `LIMIT/OFFSET` through a Spring Data `Slice`, ordered
 by `(created_at, id)`. Each query reads at most the requested page plus one row to
 calculate `has_more`; it does not load the complete table or execute a count
-query. The default limit is 50 and the maximum is 100.
+query. Related rows are batch-loaded for the page instead of queried once per
+result. The default limit is 50 and the maximum is 100.
 
 ## Curl walkthrough
 

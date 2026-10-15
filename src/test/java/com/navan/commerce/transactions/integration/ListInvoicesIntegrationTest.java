@@ -14,6 +14,7 @@ class ListInvoicesIntegrationTest extends ApiIntegrationTest {
     void usesADefaultPageSizeOfFifty() throws Exception {
         var flight = createStoredTransaction("flight.json");
         createInvoices(flight.id(), 51);
+        var statistics = resetDatabaseStatistics();
 
         var response = listInvoices(null, null, HttpStatus.OK);
 
@@ -21,6 +22,7 @@ class ListInvoicesIntegrationTest extends ApiIntegrationTest {
         assertThat(response.path("limit").intValue()).isEqualTo(50);
         assertThat(response.path("offset").longValue()).isZero();
         assertThat(response.path("has_more").booleanValue()).isTrue();
+        assertThat(statistics.getPrepareStatementCount()).isLessThanOrEqualTo(10);
     }
 
     @Test

@@ -5,6 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
+import jakarta.persistence.EntityManagerFactory;
+import org.hibernate.SessionFactory;
+import org.hibernate.stat.Statistics;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -39,11 +42,16 @@ public abstract class ApiIntegrationTest {
     @Autowired
     protected ObjectMapper objectMapper;
 
+    @Autowired
+    private EntityManagerFactory entityManagerFactory;
+
     @DynamicPropertySource
     static void configureDatabase(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url",
                 () -> "jdbc:h2:file:./target/test-data/" + DATABASE_NAME);
         registry.add("spring.jpa.open-in-view", () -> false);
+        registry.add("spring.jpa.properties.hibernate.generate_statistics", () -> true);
+        registry.add("spring.jpa.properties.hibernate.session.events.log", () -> false);
     }
 
     protected JsonNode readFixture(String path) throws IOException {
@@ -58,6 +66,12 @@ public abstract class ApiIntegrationTest {
                 .port(port)
                 .contentType(ContentType.JSON)
                 .accept(ContentType.JSON);
+    }
+
+    protected Statistics resetDatabaseStatistics() {
+        var statistics = entityManagerFactory.unwrap(SessionFactory.class).getStatistics();
+        statistics.clear();
+        return statistics;
     }
 
     protected CreatedTransaction createStoredTransaction(String fixtureName) throws Exception {
