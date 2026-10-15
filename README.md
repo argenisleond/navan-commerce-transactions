@@ -56,6 +56,9 @@ for transaction and invoice lookup, `(created_at, id)` indexes for ordered lists
 and an index on `invoice_lines.source_transaction_id` for billed-transaction
 checks. Child foreign keys are also indexed where they are queried.
 
+Money is stored as `DECIMAL(19,2)` and handled with Java `BigDecimal`; tax rates
+use `DECIMAL(9,6)`.
+
 List endpoints use database `LIMIT/OFFSET` through a Spring Data `Slice`, ordered
 by `(created_at, id)`. Each query reads at most the requested page plus one row to
 calculate `has_more`; it does not load the complete table or execute a count
@@ -86,9 +89,9 @@ TRIP_FEE_ID=$(post_seed trip_fee | jq -r '.id')
 AGENT_CALL_FEE_ID=$(post_seed agent_call_fee | jq -r '.id')
 ```
 
-Posting the flight again returns `409` and the same `FLIGHT_ID`; the database
-unique constraint ensures that only one transaction exists even for concurrent
-requests.
+Posting the flight again returns `409` and the same `FLIGHT_ID`. The following
+list query then shows one stored row for that `external_id`; the database unique
+constraint provides the same guarantee for concurrent requests.
 
 ```bash
 jq -c '.flight' seed-payloads.json |
@@ -96,6 +99,13 @@ jq -c '.flight' seed-payloads.json |
     -H 'Content-Type: application/json' \
     --data-binary @- \
     "$BASE_URL/transactions"
+
+FLIGHT_EXTERNAL_ID=$(jq -r '.flight.external_id' seed-payloads.json)
+curl --silent --show-error "$BASE_URL/transactions?limit=100&offset=0" |
+  jq --arg externalId "$FLIGHT_EXTERNAL_ID" \
+    '[.items[] | select(.external_id == $externalId)] |
+     {count: length, ids: map(.id)}'
+# {"count":1,"ids":["<FLIGHT_ID>"]}
 ```
 
 Read the flight and a transaction page:
